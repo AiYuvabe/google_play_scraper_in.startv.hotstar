@@ -25,29 +25,51 @@ result_df.to_excel("fetch_data.xlsx", index=False)
 
 result_df = pd.read_excel("fetch_data.xlsx")
 
+# 1. What is the distribution of ratings?
+
 distribution = result_df['score'].value_counts().sort_index()
-print(f"distributiondistribution)
+print(f"Distribution of ratings:\n", distribution)
 
+# 2. What is the total number of upvotes?
 upvotes_data = result_df['thumbsUpCount'].sum()
-print(upvotes_data)
+print(f"The total number of upvotes:\n", upvotes_data)
 
-# gender_distribution = result_df['gender'].value_counts()
+# # 3. Can you determine the male-to-female distribution?
 
-# filter_name = result_df[result_df['userName'].str.startswith(('pri', 'raje', 'sanjana'), na=False)]
-# print(filter_name[['userName']])
+total_users = len(result_df)
+female_users = result_df[result_df['userName'].str.endswith('ri', na=False)]
+total_female_user = len(female_users)
+total_male_users = total_users - total_female_user
 
+print(f"Total Users: {total_users}")
+print(f"Total Female Users: {total_female_user}")
+print(f"Total Male Users: {total_male_users}")
+
+# 4. What is the longest review?
 review_long = result_df.loc[result_df['content'].str.len().idxmax()]
-print(review_long['content'])
+print(f"The longest review\n", review_long['content'])
 
-result_df['at'] = pd.to_datetime(result_df['at'])
-# print(result_df['at'])
+
+result_df['at'] = pd.to_datetime(result_df['at']).sort_index(ascending=False)
+# result_df['date'] = result_df['at'].dt.date
+print(result_df['at'])
 review_frequency = result_df['at'].diff().mean()
-print(review_frequency)
+print(f"Frequently do users review the app\n", review_frequency)
 
+# # 5. How frequently do users review the app?
+result_df['at'] = pd.to_datetime(result_df['at'])
+result_df=result_df.sort_values(by='at')
+time_between_reviews = result_df['at'].diff().mean()
+print(f"Average Time Between Reviews: {time_between_reviews}")
+
+
+# # 6. When are reviews most commonly submitted?
 result_df['hour'] = result_df['at'].dt.hour
 most_common_review_hour = result_df['hour'].mode()[0]
-print(most_common_review_hour)
+print(f"Reviews most commonly submitted\n", most_common_review_hour)
 
+
+# 7. What is the overall sentiment of the app?
 
 sentiment_mapping = {
     1: 'Negative',
@@ -57,23 +79,8 @@ sentiment_mapping = {
     5: 'Positive'
 }
 result_df['Sentiment'] = result_df['score'].map(sentiment_mapping)
+# print(result_df['Sentiment'])
 sentiment_distribution = result_df['Sentiment'].value_counts(normalize=True) * 100
-print("\nOverall Sentiment Distribution:\n", sentiment_distribution)
-
-
-
-
-
-
-
-
-
-# 1. What is the distribution of ratings?
-# 2. What is the total number of upvotes?
-# 3. Can you determine the male-to-female distribution?
-# 4. What is the longest review?
-# 5. How frequently do users review the app?
-# 6. When are reviews most commonly submitted?
-# 7. What is the overall sentiment of the app?
-
+print("\nOverall Sentiment Distribution:\n", sentiment_distribution)         
+    
 
